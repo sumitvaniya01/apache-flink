@@ -1,0 +1,36 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: flink-config
+  namespace: flink
+data:
+  flink-conf.yaml: |+
+    # JobManager Configuration
+    jobmanager.rpc.address: flink-jobmanager
+    jobmanager.rpc.port: 6123
+    jobmanager.memory.process.size: 1600m  # Total memory for JobManager (adjust as needed)
+
+    # TaskManager Configuration
+    taskmanager.numberOfTaskSlots: 2       # Number of slots per TaskManager
+    taskmanager.memory.process.size: 4096m  # Total memory for each TaskManager (adjust as needed)
+
+    # State Backend and Checkpoints
+    state.backend: filesystem
+    state.checkpoints.dir: file:///opt/flink/checkpoints  # Local directory for checkpoints
+    state.savepoints.dir: file:///opt/flink/savepoints   # Local directory for savepoints
+
+    # Blob Storage
+    blob.storage.directory: /opt/flink/blob
+
+    # REST API Port
+    rest.port: 8081
+
+  log4j-console.properties: |+
+    # Log4j configuration (standard)
+    rootLogger.level = INFO
+    rootLogger.appenderRef.console.ref = ConsoleAppender
+    appender.console.type = CONSOLE
+    appender.console.name = ConsoleAppender
+    appender.console.layout.type = PatternLayout
+    appender.console.layout.pattern = %d{yyyy-MM-dd HH:mm:ss,SSS} %-5p %-60c %x - %m%n
+

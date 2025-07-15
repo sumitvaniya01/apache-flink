@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: flink-jobmanager
+  namespace: flink
+spec:
+  replicas: 1
+  serviceName: flink-jobmanager
+  selector:
+    matchLabels:
+      app: flink
+      component: jobmanager
+  template:
+    metadata:
+      labels:
+        app: flink
+        component: jobmanager
+    spec:
+      containers:
+        - name: jobmanager
+          image: apache/flink:1.18.1
+          args: ["jobmanager"]
+          ports:
+            - containerPort: 6123
+              name: rpc
+            - containerPort: 8081
+              name: ui
+          env:
+            - name: FLINK_CONF_DIR
+              value: /opt/flink/conf
+          volumeMounts:
+            - name: flink-config
+              mountPath: /opt/flink/conf
+            - name: jobmanager-storage
+              mountPath: /opt/flink/checkpoints
+      volumes:
+        - name: flink-config
+          configMap:
+            name: flink-config
+  volumeClaimTemplates:
+    - metadata:
+        name: jobmanager-storage
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 50Gi
+
