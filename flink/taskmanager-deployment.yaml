@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flink-taskmanager
+  namespace: flink
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: flink
+      component: taskmanager
+  template:
+    metadata:
+      labels:
+        app: flink
+        component: taskmanager
+    spec:
+      containers:
+        - name: taskmanager
+          image: apache/flink:1.18.1
+          args: ["taskmanager"]
+          env:
+            - name: FLINK_CONF_DIR
+              value: /opt/flink/conf
+          volumeMounts:
+            - name: flink-config
+              mountPath: /opt/flink/conf
+      volumes:
+        - name: flink-config
+          configMap:
+            name: flink-config
+
